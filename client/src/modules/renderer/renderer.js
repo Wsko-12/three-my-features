@@ -1,4 +1,7 @@
 import MAIN from '../../index.js';
+import MergedObject from './MergedObject.js';
+
+
 let THREE;
 export default {
     init(startRender){
@@ -23,6 +26,27 @@ export default {
         window.addEventListener("resize", ()=>{this.setSize()});
         this.setSize();
         
+
+        const mergedObject = new MergedObject({material:new THREE.MeshBasicMaterial({map:MAIN.ASSETS.textures.test_texture})});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         if(startRender) this.render();
     },

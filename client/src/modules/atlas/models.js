@@ -2,6 +2,26 @@ export default [
     {
         name:'test_model',
         folder:'',
-        file:'test.glb',
+        file:'polygon_size.glb',
+    },
+    {
+        name:'polygon',
+        folder:'',
+        file:'polygon.glb',
+    },
+    {
+        name:'polygon_size',
+        folder:'',
+        file:'polygon_size.glb',
+    },
+    {
+        name:'character',
+        folder:'',
+        file:'character.glb',
+    },
+    {
+        name:'pir',
+        folder:'',
+        file:'pir.glb',
     }
 ]

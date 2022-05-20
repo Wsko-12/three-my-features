@@ -27,13 +27,15 @@ export default {
         this.setSize();
         
 
-        const mergedObject = new MergedObject({material:new THREE.MeshBasicMaterial({map:MAIN.ASSETS.textures.test_texture})});
+        const nullMaterial = new THREE.MeshBasicMaterial();
+        const mergedObject = new MergedObject({material:new THREE.MeshBasicMaterial({map:MAIN.ASSETS.textures.test_texture, side:THREE.DoubleSide})});
+
+        const testMesh = new THREE.Mesh(MAIN.ASSETS.geometries.test_model,nullMaterial);
+
+        mergedObject.add(testMesh,{position:[0,0,0]});
 
 
-
-
-
-
+        scene.add(mergedObject.mesh);
 
 
 

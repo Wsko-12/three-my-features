@@ -38,19 +38,19 @@ export default {
         composer.addPass( renderPass );
 
         const CartoonOutlinePass = new CartoonOutline({
-            color:new THREE.Color(0x000000),
-            size:20,
+            color:new THREE.Color(0x303030),
+            size:2,
             difference:200,
         },new THREE.Vector2( window.innerWidth, window.innerHeight ),scene,camera);
         composer.addPass( CartoonOutlinePass );
 
 
         let colorGui = {
-            color:0x000000,
+            color:'#303030',
         }
         const gui = new GUI();
         gui.addColor( colorGui, 'color').onChange( function() { CartoonOutlinePass.color = new THREE.Color( colorGui.color ); } );
-        gui.add( CartoonOutlinePass,'size',0,50,5 );
+        gui.add( CartoonOutlinePass,'size',0,50,1 );
         gui.add( CartoonOutlinePass,'difference',0,2000,100 );
 
    
@@ -69,6 +69,27 @@ export default {
             );
             mesh.position.set(-2,0,-2.5);
             scene.add(mesh)
+
+
+
+        MAIN.ASSETS.textures.texture_plant.magFilter = THREE.NearestFilter;
+        
+        const count = 2;
+        for(let x = -count; x<count;x++){
+            for(let y = -count; y<count;y++){
+                const plant = new THREE.Mesh(
+                    MAIN.ASSETS.geometries.plant,
+                    
+                    new THREE.MeshBasicMaterial({map:MAIN.ASSETS.textures.texture_plant,side:THREE.DoubleSide,transparent:true,alphaTest: 0.5,}),
+                );
+                plant.position.x = x*0.1-2 + Math.random()-0.5;
+                plant.position.z = y*0.1 + Math.random()-0.5;
+
+                plant.rotation.y = Math.random();
+                scene.add(plant);
+            }
+        }
+
 
         if(startRender) this.render();
     },

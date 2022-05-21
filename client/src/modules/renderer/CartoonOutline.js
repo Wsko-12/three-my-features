@@ -83,6 +83,7 @@ class CartoonOutline extends Pass{
                     }else{
                         gl_FragColor = texture;
                     }
+                    // gl_FragColor = vec4(depthColor,1.0);
                 }`,
         })
     }

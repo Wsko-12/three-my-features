@@ -28,5 +28,10 @@ export default [
         name:'pyramid',
         folder:'',
         file:'pyramid.glb',
+    },
+    {
+        name:'plant',
+        folder:'',
+        file:'plant.glb',
     }
 ]

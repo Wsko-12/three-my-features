@@ -4,6 +4,7 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import {CartoonOutline} from './CartoonOutline.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import { GUI } from 'dat.gui';
 
 let THREE;
 export default {
@@ -39,10 +40,20 @@ export default {
         const CartoonOutlinePass = new CartoonOutline({
             color:new THREE.Color(0x000000),
             size:20,
-            difference:0.005,
+            difference:200,
         },new THREE.Vector2( window.innerWidth, window.innerHeight ),scene,camera);
         composer.addPass( CartoonOutlinePass );
 
+
+        let colorGui = {
+            color:0x000000,
+        }
+        const gui = new GUI();
+        gui.addColor( colorGui, 'color').onChange( function() { CartoonOutlinePass.color = new THREE.Color( colorGui.color ); } );
+        gui.add( CartoonOutlinePass,'size',0,50,5 );
+        gui.add( CartoonOutlinePass,'difference',0,2000,100 );
+
+   
 
         this.controls = new OrbitControls(camera, renderer.domElement);
         MAIN.ASSETS.textures.test_texture.magFilter = THREE.NearestFilter;

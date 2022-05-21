@@ -19,6 +19,7 @@
   "devDependencies": {
     "copy-webpack-plugin": "^10.2.4",
     "css-loader": "^6.7.1",
+    "dat.gui": "^0.7.9",
     "html-webpack-plugin": "^5.5.0",
     "sass": "^1.51.0",
     "sass-loader": "^12.6.0",

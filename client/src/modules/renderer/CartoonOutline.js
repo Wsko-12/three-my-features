@@ -72,7 +72,7 @@ class CartoonOutline extends Pass{
                         float depth_average = depth_sum*0.25;
                         
                         
-                        float depthAverageColor_float = step(abs(depth_average - depth),outlineDifference);
+                        float depthAverageColor_float = step(abs(depth_average - depth),1.0/outlineDifference);
                         vec3 depthAverageColor = vec3(depthAverageColor_float);
                         
                         if(1.0 - depthAverageColor_float > 0.0){
@@ -115,10 +115,10 @@ class CartoonOutline extends Pass{
 
     set color(color){
         if(!(color instanceof THREE.Color)) return;
-        this.material.uniforms.outlineSize.value = value;
+        this.material.uniforms.outlineColor.value = color;
     }
     get color(){
-        return this.material.uniforms.outlineSize.value;
+        return this.material.uniforms.outlineColor.value;
     }
 };
 

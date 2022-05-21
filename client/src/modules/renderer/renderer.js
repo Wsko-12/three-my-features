@@ -1,4 +1,9 @@
 import MAIN from '../../index.js';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import {CartoonOutline} from './CartoonOutline.js'
+
 let THREE;
 export default {
     init(startRender){
@@ -16,13 +21,29 @@ export default {
         this.camera = camera;
         camera.position.set(10, 10, 10);
         camera.lookAt(0, 0, 0);
-        
+
         const scene = new THREE.Scene();
         this.scene = scene;
 
         window.addEventListener("resize", ()=>{this.setSize()});
         this.setSize();
         
+        
+        const composer = new EffectComposer( renderer );
+        this.composer = composer;
+        const renderPass = new RenderPass( scene, camera );
+        composer.addPass( renderPass );
+
+        // const CartoonOutlinePass = new ShaderPass(  );
+        composer.addPass( new CartoonOutline(new THREE.Vector2( window.innerWidth, window.innerHeight )) );
+
+        MAIN.ASSETS.textures.test_texture.magFilter = THREE.NearestFilter;
+        this.scene.add(
+            new THREE.Mesh(
+                MAIN.ASSETS.geometries.character,
+                new THREE.MeshBasicMaterial({map:MAIN.ASSETS.textures.test_texture})
+                )
+            );
 
         if(startRender) this.render();
     },
@@ -40,7 +61,8 @@ export default {
     },
 
     render:function(){
-        this.renderer.render(this.scene, this.camera);
+        // this.renderer.render(this.scene, this.camera);
+        this.composer.render();
         requestAnimationFrame(()=>{this.render()});
     },
 };

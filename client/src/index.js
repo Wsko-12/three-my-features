@@ -9,7 +9,6 @@ export default {
   ASSETS:ASSETS,
 };
 ASSETS.load().then(assets => {
-  console.log(assets)
+  RENDERER.init(true);
 });
 
-RENDERER.init();

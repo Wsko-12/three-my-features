@@ -16,10 +16,6 @@ class CartoonOutline extends Pass{
         target.depthTexture.format = THREE.DepthFormat;
         target.depthTexture.type = THREE.UnsignedShortType;
         this.target = target;
-
-
-        console.log(this.camera)
-
         this.fsQuad = new FullScreenQuad( null );
         this.material = new THREE.ShaderMaterial({
             uniforms: {
@@ -56,8 +52,21 @@ class CartoonOutline extends Pass{
                     vec4 texture = texture2D( tDiffuse, vUv );
                     float depth = readDepth( tDepth, vUv );
                     vec3 depthColor = 1.0 - vec3( depth );
-                    vec3 depthColorPow = depthColor * depthColor;
-                    gl_FragColor = vec4(depthColorPow*2.0,1.0);
+
+                    float shift = 0.005;
+                    float depth_top = readDepth(tDepth, vec2(vUv.x,vUv.y+shift));
+                    float depth_bottom = readDepth(tDepth, vec2(vUv.x,vUv.y-shift));
+                    float depth_left = readDepth(tDepth, vec2(vUv.x-shift,vUv.y));
+                    float depth_right = readDepth(tDepth, vec2(vUv.x+shift,vUv.y));
+
+                    float depth_sum = depth_top + depth_bottom + depth_left + depth_right;
+                    float depth_average = depth_sum/4.0;
+                    
+                    float depthAverageColor_float =step((depth_average - depth)*10.0, 0.005);
+                    vec3 depthAverageColor = vec3(depthAverageColor_float);
+
+                    gl_FragColor = vec4(texture.rgb*depthAverageColor_float,1.0);
+                    
                 }`,
         })
     }

@@ -18,6 +18,7 @@ export default {
             canvas: canvasRenderer,
         });
         this.renderer = renderer;
+        renderer.setClearColor(new THREE.Color(0.5,0.65,0.8));
         const camera = new THREE.PerspectiveCamera(10, 2, 0.2, 500);
         this.camera = camera;
         camera.position.set(10, 10, 10);

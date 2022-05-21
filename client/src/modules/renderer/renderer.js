@@ -36,8 +36,12 @@ export default {
         const renderPass = new RenderPass( scene, camera );
         composer.addPass( renderPass );
 
-        // const CartoonOutlinePass = new ShaderPass(  );
-        composer.addPass( new CartoonOutline(new THREE.Vector2( window.innerWidth, window.innerHeight ),scene,camera) );
+        const CartoonOutlinePass = new CartoonOutline({
+            color:new THREE.Color(0x000000),
+            size:20,
+            difference:0.005,
+        },new THREE.Vector2( window.innerWidth, window.innerHeight ),scene,camera);
+        composer.addPass( CartoonOutlinePass );
 
 
         this.controls = new OrbitControls(camera, renderer.domElement);
@@ -52,7 +56,7 @@ export default {
             MAIN.ASSETS.geometries.sphere,
             new THREE.MeshBasicMaterial({map:MAIN.ASSETS.textures.test_texture})
             );
-            mesh.position.set(-2,0,-2);
+            mesh.position.set(-2,0,-2.5);
             scene.add(mesh)
 
         if(startRender) this.render();

@@ -35,6 +35,7 @@ class CartoonOutline extends Pass{
             fragmentShader: /* glsl */`
                 #include <common>
                 #include <packing>
+                precision lowp float;
                 uniform sampler2D tDiffuse;
                 uniform sampler2D tDepth;
                 varying vec2 vUv;
@@ -52,21 +53,28 @@ class CartoonOutline extends Pass{
                     vec4 texture = texture2D( tDiffuse, vUv );
                     float depth = readDepth( tDepth, vUv );
                     vec3 depthColor = 1.0 - vec3( depth );
-
-                    float shift = 0.005;
-                    float depth_top = readDepth(tDepth, vec2(vUv.x,vUv.y+shift));
-                    float depth_bottom = readDepth(tDepth, vec2(vUv.x,vUv.y-shift));
-                    float depth_left = readDepth(tDepth, vec2(vUv.x-shift,vUv.y));
-                    float depth_right = readDepth(tDepth, vec2(vUv.x+shift,vUv.y));
-
-                    float depth_sum = depth_top + depth_bottom + depth_left + depth_right;
-                    float depth_average = depth_sum/4.0;
-                    
-                    float depthAverageColor_float =step((depth_average - depth)*10.0, 0.005);
-                    vec3 depthAverageColor = vec3(depthAverageColor_float);
-
-                    gl_FragColor = vec4(texture.rgb*depthAverageColor_float,1.0);
-                    
+                    float size = 15.0;
+                    vec3 outlineColor = vec3(0.0,0.0,0.0);
+                    float shift = (1.0 - depth)*size/1000.0;
+                    if(depth > 0.0){
+                        float depth_top = readDepth(tDepth, vec2(vUv.x,vUv.y+shift));
+                        float depth_bottom = readDepth(tDepth, vec2(vUv.x,vUv.y-shift));
+                        float depth_left = readDepth(tDepth, vec2(vUv.x-shift,vUv.y));
+                        float depth_right = readDepth(tDepth, vec2(vUv.x+shift,vUv.y));
+                        float depth_sum = depth_top + depth_bottom + depth_left + depth_right;
+                        float depth_average = depth_sum*0.25;
+                        
+                        float depthAverageColor_float = step(abs(depth_average - depth), 0.005);
+                        vec3 depthAverageColor = vec3(depthAverageColor_float);
+                        
+                        if(1.0 - depthAverageColor_float > 0.0){
+                            gl_FragColor = vec4(outlineColor,1.0);
+                        }else{
+                            gl_FragColor = texture;
+                        }
+                    }else{
+                        gl_FragColor = texture;
+                    }
                 }`,
         })
     }

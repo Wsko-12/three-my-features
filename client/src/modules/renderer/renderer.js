@@ -52,7 +52,7 @@ export default {
             MAIN.ASSETS.geometries.sphere,
             new THREE.MeshBasicMaterial({map:MAIN.ASSETS.textures.test_texture})
             );
-            mesh.position.set(-2,0,-2);
+            mesh.position.set(-2,0,-2.5);
             scene.add(mesh)
 
         if(startRender) this.render();

@@ -2,7 +2,12 @@ export default [
     {
         name:'test_model',
         folder:'',
-        file:'polygon_size.glb',
+        file:'character.glb',
+    },
+    {
+        name:'sphere',
+        folder:'',
+        file:'sphere.glb',
     },
     {
         name:'polygon',

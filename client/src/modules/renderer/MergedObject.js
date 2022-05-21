@@ -27,71 +27,53 @@ class List{
     }
     remove(node){
         this.length--;
+        const prev = node.prev;
+        const next = node.next;
+
         if(!node.prev){
             this.head = node.next;
         }else{
             node.prev.next = node.next;
-        }
+        };
+
         if(node.next){
             node.next.prev = node.prev;
         }else{
             this.tail = node.prev;
         };
+
         if(this.tail !== node.prev){
-            // let next = node.next
+            let current = node.next;
+            let prev = node.prev;
+            while(current){
+                if(prev){
+                    current.offsets.position = prev.offsets.position + prev.counts.position;
+                    current.offsets.index = prev.offsets.index + prev.counts.index;
+                }else{
+                    current.offsets.position = 3;
+                    current.offsets.index = 3;
+                }
 
-            // let maxPrev;
-            // // STAMP_1 const arr = [...this.mergedObject.geometry.index.array];
-            // while(next){
-            //     let currentMax = 0;
-            //     next.attributes.position.index -= node.attributes.position.count;
-            //     next.attributes.normal.index -= node.attributes.normal.count;
-            //     next.attributes.uv.index -= node.attributes.uv.count;
-            //     next.attributes.index.index -= node.attributes.index.count;
+                current.object.geometry.index.array.forEach((item,i) => {
+                    this.mergedObject.attributesArray.index[current.offsets.index + i] = item + current.offsets.position;
+                });
                 
-            //     // 54.35400390625 ms
-            //     // const arrMax = arr.slice(next.prev ? next.prev.attributes.index.index : 0,next.attributes.index.index);
-
-
-            //     // 65.72119140625 ms
-            //     //48.01611328125 ms
-            //     const currIndex = next.attributes.index.index;
-                
-            //     if(!maxPrev){
-            //         const arrMax = this.mergedObject.geometry.index.array.slice(next.prev ? next.prev.attributes.index.index : 0,next.attributes.index.index);
-            //         arrMax.forEach(el => {if(el > maxPrev) maxPrev = el });
-            //     };
-
-                
-            //     for(let i = currIndex,j=0;j<next.attributes.index.count;j++,i++){
-            //         // console.log(this.mergedObject.geometry.index.array[i],'->',next.attributes.indexInitial.array[j]+max+1);
-            //         this.mergedObject.geometry.index.array[i] = next.attributes.indexInitial.array[j]+maxPrev+1;
-            //         if(currentMax < next.attributes.indexInitial.array[j]+maxPrev+1){
-            //             currentMax = next.attributes.indexInitial.array[j]+maxPrev+1;
-            //         };
-            //     };
-            //     maxPrev = currentMax;
-            //     console.log(currentMax);
-
-                
-            //     next = next.next;
-            // };
-            // console.log('remove: ',this.geometry.index);
+                prev = current;
+                current = current.next;
+            };
         };
     }
 }
 class Node{
-    constructor(object,offset){
+    constructor(object,offsets,counts){
         this.object = object;
         this.next = null;
         this.prev = null;
-        object.inMergedGeometryNode = this;
-        this.offset = offset;
+        object.inMergedObjectNode = this;
+        this.offsets = offsets;
+        this.counts = counts;
 
-        this.baseAttributes = {
-            attributesCount : object.geometry.attributes.position.count,
-            index: [...object.geometry.index.array],
-        };
+        this.attributesCount = object.geometry.attributes.position.count;
     }
 }
 
@@ -100,7 +82,6 @@ export default class MergedObject{
     constructor(properties){
         this.geometry = properties.geometry || MAIN.ASSETS.geometries.polygon.clone();
         this.list = new List(this);
-        this.attributes = this.geometry.attributes;
 
         this.attributesArray = {};
 
@@ -112,29 +93,56 @@ export default class MergedObject{
         this.material = properties.material;
         this.mesh = new THREE.Mesh(this.geometry,this.material);
         this.mesh.geometry = this.geometry;
-        console.log(this);
     }
     add(object,properties){
+        if(!object) return;
         const childGeometry = object.geometry.clone();
         properties.position && childGeometry.translate(...properties.position);
 
-        const node = new Node(object,this.geometry.attributes.position.count);
-        this.list.add(node);
+       
+        
         for(let atr in childGeometry.attributes){
-            this.attributesArray[atr] = this.attributesArray[atr].concat([...childGeometry.attributes[atr].array]);
+            if(!this.attributesArray[atr]){
+                console.error('Geometries must have the same attributes');
+                return;
+            };
+            this.attributesArray[atr].push(...childGeometry.attributes[atr].array)
+        };
+        const offsets = {
+            position:this.geometry.attributes.position.count,
+            index:this.geometry.index.count,
+        };
+        const counts = {
+            position:childGeometry.attributes.position.count,
+            index:childGeometry.index.count,
         }
-        const offset = this.geometry.attributes.position.count;
+       
         childGeometry.index.array.forEach(inx => {
-            this.attributesArray.index.push(inx+offset);
+            this.attributesArray.index.push(inx + offsets.position);
         });
+
+        const node = new Node(object,offsets,counts);
+        this.list.add(node);
         
         this.update();
+        return this;
     };
     remove(object){
+        if(object.inMergedObject != this) return;
 
+        const node = object.inMergedObjectNode;
+        if(!node) return;
+        for(const atr in object.geometry.attributes){
+            this.attributesArray[atr].splice(node.offsets.position*object.geometry.attributes[atr].itemSize,
+                                             object.geometry.attributes[atr].array.length);
+        }
+        this.attributesArray.index.splice(node.offsets.index, object.geometry.index.array.length)
+
+        this.list.remove(node);
+        this.update();
     };
 
-    update(){
+    update(con){
         this.geometry.setAttribute('position',new THREE.BufferAttribute(new Float32Array(this.attributesArray.position),3));
         this.geometry.setAttribute('normal',new THREE.BufferAttribute(new Float32Array(this.attributesArray.normal),3));
         this.geometry.setAttribute('uv',new THREE.BufferAttribute(new Float32Array(this.attributesArray.uv),2));

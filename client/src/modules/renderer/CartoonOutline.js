@@ -115,10 +115,10 @@ class CartoonOutline extends Pass{
 
     set color(color){
         if(!(color instanceof THREE.Color)) return;
-        this.material.uniforms.outlineColor.value = color;
+        this.material.uniforms.outlineSize.value = value;
     }
     get color(){
-        return this.material.uniforms.outlineColor.value;
+        return this.material.uniforms.outlineSize.value;
     }
 };
 

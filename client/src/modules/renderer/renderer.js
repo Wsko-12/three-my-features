@@ -3,6 +3,7 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import {CartoonOutline} from './CartoonOutline.js'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 let THREE;
 export default {
@@ -35,8 +36,10 @@ export default {
         composer.addPass( renderPass );
 
         // const CartoonOutlinePass = new ShaderPass(  );
-        composer.addPass( new CartoonOutline(new THREE.Vector2( window.innerWidth, window.innerHeight )) );
+        composer.addPass( new CartoonOutline(new THREE.Vector2( window.innerWidth, window.innerHeight ),scene,camera) );
 
+
+        this.controls = new OrbitControls(camera, renderer.domElement);
         MAIN.ASSETS.textures.test_texture.magFilter = THREE.NearestFilter;
         this.scene.add(
             new THREE.Mesh(
@@ -44,6 +47,12 @@ export default {
                 new THREE.MeshBasicMaterial({map:MAIN.ASSETS.textures.test_texture})
                 )
             );
+        const mesh = new THREE.Mesh(
+            MAIN.ASSETS.geometries.sphere,
+            new THREE.MeshBasicMaterial({map:MAIN.ASSETS.textures.test_texture})
+            );
+            mesh.position.set(-2,0,-2);
+            scene.add(mesh)
 
         if(startRender) this.render();
     },

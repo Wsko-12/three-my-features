@@ -73,10 +73,11 @@ class CartoonOutline extends Pass{
                     float depth_left = 1.0 - readDepth(tDepth, vec2(vUv.x-shift_x,vUv.y));
                     float depth_right = 1.0 - readDepth(tDepth, vec2(vUv.x+shift_x,vUv.y));
 
-                    float depth_round_average = (depth_top+depth_bottom+depth_left+depth_right)*0.25;
-                    float outline = abs(depth-depth_round_average);
-                    float outline_step = 1.0 - step(outline,0.004);
-                    gl_FragColor = vec4(mix(texture.rgb, outlineColor, outline_step),1.0);
+
+                    float depth_round_average = (depth+depth_top+depth_bottom+depth_left+depth_right)*0.20;
+                    float outline = abs(depth - depth_round_average);
+                    float outline_step = 1.0 - step(outline,1.0/outlineDifference);
+                    gl_FragColor = vec4(mix(texture.rgb,outlineColor,outline_step),1.0);
                 }`,
         })
     }

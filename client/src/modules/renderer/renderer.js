@@ -39,8 +39,8 @@ export default {
 
         const CartoonOutlinePass = new CartoonOutline({
             color:new THREE.Color(0x303030),
-            size:2,
-            difference:200,
+            size:1,
+            difference:400,
         },new THREE.Vector2( window.innerWidth, window.innerHeight ),scene,camera);
         composer.addPass( CartoonOutlinePass );
         
@@ -53,7 +53,7 @@ export default {
         const gui = new GUI();
         gui.addColor( colorGui, 'color').onChange( function() { CartoonOutlinePass.color = new THREE.Color( colorGui.color ); } );
         gui.add( CartoonOutlinePass,'size',0,10,1 );
-        gui.add( CartoonOutlinePass,'difference',0,2000,100 );
+        gui.add( CartoonOutlinePass,'difference',0,2000,10 );
 
    
 

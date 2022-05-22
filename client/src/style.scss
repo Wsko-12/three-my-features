@@ -1,10 +1,16 @@
 html{
     overflow: hidden;
+    width: 100vw;
+    height: 100vh;
 }
 body{
     margin: 0;
-    background-color: red;
+    background-color: rgb(255, 255, 255);
+    width: 100vw;
+    height: 100vh;
 }
 canvas{
     background-color: rgb(108, 93, 136);
+    width: 100%;
+    height: 100vh;
 }

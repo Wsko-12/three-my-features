@@ -29,7 +29,7 @@ export default {
         this.scene = scene;
 
         window.addEventListener("resize", ()=>{this.setSize()});
-        this.setSize();
+        
         
         
         const composer = new EffectComposer( renderer );
@@ -43,14 +43,16 @@ export default {
             difference:200,
         },new THREE.Vector2( window.innerWidth, window.innerHeight ),scene,camera);
         composer.addPass( CartoonOutlinePass );
-
+        
+        this.setSize();
+       
 
         let colorGui = {
             color:'#303030',
         }
         const gui = new GUI();
         gui.addColor( colorGui, 'color').onChange( function() { CartoonOutlinePass.color = new THREE.Color( colorGui.color ); } );
-        gui.add( CartoonOutlinePass,'size',0,50,1 );
+        gui.add( CartoonOutlinePass,'size',0,10,1 );
         gui.add( CartoonOutlinePass,'difference',0,2000,100 );
 
    
@@ -95,15 +97,21 @@ export default {
     },
 
     setSize(){
-        const windowWidth = window.innerWidth;
-        const windowHeight = window.innerHeight;
+        const canvas = this.renderer.domElement;
         const windowPixelRatio = Math.min(window.devicePixelRatio, 2);
+        const windowWidth = +canvas.clientWidth * windowPixelRatio;
+        const windowHeight = +canvas.clientHeight * windowPixelRatio;
 
-        this.renderer.setSize(windowWidth, windowHeight);
+
+        
+        this.renderer.setSize(windowWidth, windowHeight,false);
         this.renderer.setPixelRatio(windowPixelRatio);
 
         this.camera.aspect = windowWidth / windowHeight;
         this.camera.updateProjectionMatrix();
+        if(this.composer){
+            this.composer.setSize(windowWidth, windowHeight);
+        }
     },
 
     render:function(){

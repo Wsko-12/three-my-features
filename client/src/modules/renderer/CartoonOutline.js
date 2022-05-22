@@ -9,9 +9,9 @@ class CartoonOutline extends Pass{
         this.camera = camera;
         this.resolution = new THREE.Vector2( resolution.x, resolution.y );
 
-        const target = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
+        const target = new THREE.WebGLRenderTarget( resolution.x, resolution.y );
         target.texture.minFilter = THREE.NearestFilter;
-        target.texture.magFilter = THREE.NearestFilter;;
+        target.texture.magFilter = THREE.NearestFilter;
         target.depthTexture = new THREE.DepthTexture();
         target.depthTexture.format = THREE.DepthFormat;
         target.depthTexture.type = THREE.UnsignedShortType;
@@ -26,6 +26,7 @@ class CartoonOutline extends Pass{
                 outlineColor:{value:properties.color},
                 outlineSize:{value:properties.size},
                 outlineDifference:{value:properties.difference},
+                resolution:{value:resolution},
             },
         
             vertexShader: /* glsl */`
@@ -42,6 +43,9 @@ class CartoonOutline extends Pass{
                 uniform sampler2D tDiffuse;
                 uniform sampler2D tDepth;
                 varying vec2 vUv;
+
+
+                uniform vec2 resolution;
                 uniform float cameraNear;
                 uniform float cameraFar;
                 uniform vec3 outlineColor;
@@ -58,32 +62,21 @@ class CartoonOutline extends Pass{
 
                 void main() {
                     vec4 texture = texture2D( tDiffuse, vUv );
-                    float depth = readDepth( tDepth, vUv );
-                    vec3 depthColor = 1.0 - vec3( depth );
-                    
-                    
-                    float shift = (1.0 - depth)*outlineSize/1000.0;
-                    if(depth > 0.0){
-                        float depth_top = readDepth(tDepth, vec2(vUv.x,vUv.y+shift));
-                        float depth_bottom = readDepth(tDepth, vec2(vUv.x,vUv.y-shift));
-                        float depth_left = readDepth(tDepth, vec2(vUv.x-shift,vUv.y));
-                        float depth_right = readDepth(tDepth, vec2(vUv.x+shift,vUv.y));
-                        float depth_sum = depth_top + depth_bottom + depth_left + depth_right;
-                        float depth_average = depth_sum*0.25;
-                        
-                        
-                        float depthAverageColor_float = step(abs(depth_average - depth),1.0/outlineDifference);
-                        vec3 depthAverageColor = vec3(depthAverageColor_float);
-                        
-                        if(1.0 - depthAverageColor_float > 0.0){
-                            gl_FragColor = vec4(outlineColor,1.0);
-                        }else{
-                            gl_FragColor = texture;
-                        }
-                    }else{
-                        gl_FragColor = texture;
-                    }
-                    // gl_FragColor = vec4(depthColor,1.0);
+                    float depth = 1.0 - readDepth( tDepth, vUv );
+                    // vec3 depthColor = vec3(depth);
+
+                    float shift_x = (1.0/(resolution.x*0.5)*0.5) * outlineSize;
+                    float shift_y = (1.0/(resolution.y*0.5)*0.5) * outlineSize;
+
+                    float depth_top = 1.0 - readDepth(tDepth, vec2(vUv.x,vUv.y+shift_y));
+                    float depth_bottom = 1.0 - readDepth(tDepth, vec2(vUv.x,vUv.y-shift_y));
+                    float depth_left = 1.0 - readDepth(tDepth, vec2(vUv.x-shift_x,vUv.y));
+                    float depth_right = 1.0 - readDepth(tDepth, vec2(vUv.x+shift_x,vUv.y));
+
+                    float depth_round_average = (depth_top+depth_bottom+depth_left+depth_right)*0.25;
+                    float outline = abs(depth-depth_round_average);
+                    float outline_step = 1.0 - step(outline,0.004);
+                    gl_FragColor = vec4(mix(texture.rgb, outlineColor, outline_step),1.0);
                 }`,
         })
     }
@@ -94,12 +87,17 @@ class CartoonOutline extends Pass{
         this.material.uniforms.tDepth.value = this.target.depthTexture;
         this.material.uniforms.tDiffuse.value = this.target.texture;
 
-
         this.fsQuad.material = this.material;
         renderer.setRenderTarget( null );
         this.fsQuad.render( renderer );
     }
+    setSize(...size){
+        this.target.setSize(...size);
+        this.material.uniforms.resolution.value.x = size[0];
+        this.material.uniforms.resolution.value.y = size[1];
+        // alert(size[0] + ':' + size[1]);
 
+    }
     set size(value){
         this.material.uniforms.outlineSize.value = value;
     }

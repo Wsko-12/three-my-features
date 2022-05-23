@@ -18,6 +18,8 @@ export default {
         const renderer = new THREE.WebGLRenderer({
             canvas: canvasRenderer,
         });
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.renderer = renderer;
         renderer.setClearColor(new THREE.Color(0.5,0.65,0.8));
         const camera = new THREE.PerspectiveCamera(10, 2, 0.2, 500);
@@ -75,24 +77,92 @@ export default {
 
 
         MAIN.ASSETS.textures.texture_plant.magFilter = THREE.NearestFilter;
+
+        const depthMat = new THREE.MeshDepthMaterial( {
+            depthPacking: THREE.RGBADepthPacking,
+            map: MAIN.ASSETS.textures.texture_plant,
+            alphaTest: 0.5
+        } );
         
         const count = 2;
+        const plantMat = new THREE.MeshPhongMaterial({shininess:0,map:MAIN.ASSETS.textures.texture_plant,side:THREE.DoubleSide,transparent:true,alphaTest: 0.5,});
         for(let x = -count; x<count;x++){
             for(let y = -count; y<count;y++){
                 const plant = new THREE.Mesh(
                     MAIN.ASSETS.geometries.plant,
-                    
-                    new THREE.MeshBasicMaterial({map:MAIN.ASSETS.textures.texture_plant,side:THREE.DoubleSide,transparent:true,alphaTest: 0.5,}),
+                    plantMat
+                   
                 );
-                plant.position.x = x*0.1-2 + Math.random()-0.5;
-                plant.position.z = y*0.1 + Math.random()-0.5;
+                plant.castShadow = true; //default is false
+                plant.receiveShadow = true;
+                plant.position.x = x*0.1-2 + (Math.random()-0.5)*0.8;
+                plant.position.z = y*0.1 + (Math.random()-0.5)*0.8;
+                plant.customDepthMaterial = depthMat;
+                plant.rotation.y = Math.random();
+                scene.add(plant);
+            }
+        }
+
+        for(let x = -count; x<count;x++){
+            for(let y = -count; y<count;y++){
+                const plant = new THREE.Mesh(
+                    MAIN.ASSETS.geometries.plant_1,
+                    plantMat
+                   
+                );
+                plant.position.x = x*0.1-2 + (Math.random()-0.5)*0.8;
+                plant.position.z = y*0.1 + (Math.random()-0.5)*0.8;
+                plant.castShadow = true; //default is false
+                plant.receiveShadow = true;
+                plant.customDepthMaterial = depthMat;
 
                 plant.rotation.y = Math.random();
                 scene.add(plant);
             }
         }
 
+        for(let x = -count; x<count;x++){
+            for(let y = -count; y<count;y++){
+                const plant = new THREE.Mesh(
+                    MAIN.ASSETS.geometries.plant_2,
+                    plantMat
+                   
+                );
+                plant.position.x = x*0.1-2 + (Math.random()-0.5)*0.8;
+                plant.position.z = y*0.1 + (Math.random()-0.5)*0.8;
+                plant.castShadow = true; //default is false
+                plant.receiveShadow = true; 
+                plant.customDepthMaterial = depthMat;
 
+
+                plant.rotation.y = Math.random();
+                scene.add(plant);
+            }
+        }
+
+        const box  = new THREE.Mesh(
+            MAIN.ASSETS.geometries.fences,
+            plantMat
+           
+        );
+        box.position.x -= 2;
+        box.position.y -= 0.15;
+        box.receiveShadow = true;
+        scene.add(box);
+
+        const light = new THREE.DirectionalLight();
+        light.shadow.mapSize.width = 2048; // default
+light.shadow.mapSize.height = 2048; // default
+light.shadow.bias = -0.0001;
+        light.position.set(5,5,5);
+        light.target.position.set(0,0,0);
+        light.castShadow = true;
+        scene.add(light);
+        scene.add(light.target);
+        
+
+        const light_a = new THREE.AmbientLight(new THREE.Color(0x505050),1.0);
+        scene.add(light_a);
         if(startRender) this.render();
     },
 

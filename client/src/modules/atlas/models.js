@@ -10,6 +10,11 @@ export default [
         file:'sphere.glb',
     },
     {
+        name:'fences',
+        folder:'',
+        file:'fences.glb',
+    },
+    {
         name:'polygon',
         folder:'',
         file:'polygon.glb',
@@ -33,5 +38,15 @@ export default [
         name:'plant',
         folder:'',
         file:'plant.glb',
+    },
+    {
+        name:'plant_1',
+        folder:'',
+        file:'plant_1.glb',
+    },
+    {
+        name:'plant_2',
+        folder:'',
+        file:'plant_2.glb',
     }
 ]

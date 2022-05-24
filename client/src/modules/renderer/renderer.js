@@ -28,15 +28,21 @@ export default {
     },
 
     setSize(){
-        const windowWidth = window.innerWidth;
-        const windowHeight = window.innerHeight;
+        const canvas = this.renderer.domElement;
         const windowPixelRatio = Math.min(window.devicePixelRatio, 2);
+        const windowWidth = +canvas.clientWidth * windowPixelRatio;
+        const windowHeight = +canvas.clientHeight * windowPixelRatio;
 
-        this.renderer.setSize(windowWidth, windowHeight);
+
+        
+        this.renderer.setSize(windowWidth, windowHeight,false);
         this.renderer.setPixelRatio(windowPixelRatio);
 
         this.camera.aspect = windowWidth / windowHeight;
         this.camera.updateProjectionMatrix();
+        if(this.composer){
+            this.composer.setSize(windowWidth, windowHeight);
+        }
     },
 
     render:function(){

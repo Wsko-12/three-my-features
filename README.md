@@ -1,4 +1,4 @@
-# webpack-three-mobile
+# three-my-features
 
 Utils:
 * MergedObject: https://wsko-12.github.io/webpack-three-mobile/MergedObject/  
